@@ -16,8 +16,20 @@ const storage = multer.diskStorage({
       cb(null, shortid.generate() + "." + file.originalname)
     }
   })
+
+
    
-const upload = multer({ storage: storage })
+const upload = multer({
+  storage: storage,
+  fileFilter:(req,file,cb)=>{
+    if(!file.mimetype.match(/jpeg|png|png|gif$i/)) {
+      cb(new Error("file is not supported"),false)
+      return
+    }
+    cb(null,true)
+  } 
+
+  })
 
 
 router.post('/product/addProduct',requireSignin,isAdminLogin,upload.array('productImage'),addProduct);

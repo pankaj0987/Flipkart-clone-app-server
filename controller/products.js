@@ -1,16 +1,29 @@
 const Product = require('../model/productSchema');
 const Brand=require('../model/brand')
+const cloudinary=require('../utils/cloudnary')
 const fs = require('fs');
 const path = require('path');
 
 exports.addProduct = async (req, res) => {
     try {
         const { name, price, offer, quantity,brand, description, highlights, category } = req.body;
+        // const result=await cloudinary.uploader.upload(req.file.path)
+        // return res.status(201).json({result})
+        const uploaded=async(path)=>await cloudinary.uploads(path,'flipkart_clone')
+    
+        const urls=[]
+        const files=req.files
+        for(const file of files){
+        const {path}=file
+        const newPath=await uploaded(path)
+        urls.push(newPath)
+        fs.unlinkSync(path)
+        }
 
         let productImage = []
         if (req.files.length > 0) {
-            productImage = req.files.map(file => {
-                return { img: file.filename }
+            productImage = urls.map(file => {
+                return { img: file.url }
             })
         }
         let product
@@ -33,6 +46,7 @@ exports.addProduct = async (req, res) => {
         }
         return res.status(401).json({ error: "failed to add product" })
     } catch (error) {
+        console.log(error)
         return res.status(501).json({ error })
     }
 }

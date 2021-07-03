@@ -24,6 +24,7 @@ exports.requireSignin = (req, res, next) => {
             if (err) {
                 return res.status(501).json({ message: "jwt expired" })
             }
+            console.log(decoded)
             req.user = decoded;
           });
 
@@ -38,6 +39,7 @@ exports.requireSignin = (req, res, next) => {
 
 exports.isAdminLogin = async (req, res, next) => {
     try {
+        console.log(req.user)
         const { role } = req.user;
 
         if (role === "admin") {
