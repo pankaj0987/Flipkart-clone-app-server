@@ -7,8 +7,6 @@ const path = require('path');
 exports.addProduct = async (req, res) => {
     try {
         const { name, price, offer, quantity,brand, description, highlights, category } = req.body;
-        // const result=await cloudinary.uploader.upload(req.file.path)
-        // return res.status(201).json({result})
         const uploaded=async(path)=>await cloudinary.uploads(path,'flipkart_clone')
     
         const urls=[]
@@ -56,14 +54,13 @@ exports.deleteProduct = async (req, res) => {
         const { id } = req.body;
         const finding = await Product.findOne({ _id: id })
         if (finding) {
-            finding.productImage.forEach(img => {
-                if (`${path.join(path.dirname(__dirname), 'Uploads')}/${img.img}`) {
-                    fs.unlink(`${path.join(path.dirname(__dirname), 'Uploads')}/${img.img}`, function (err) {
-                        if (err) throw err;
-                    })
-                }
-
-            })
+            // finding.productImage.forEach(img => {
+            //     if (`${path.join(path.dirname(__dirname), 'Uploads')}/${img.img}`) {
+            //         fs.unlink(`${path.join(path.dirname(__dirname), 'Uploads')}/${img.img}`, function (err) {
+            //             if (err) throw err;
+            //         })
+            //     }
+            // })
             const deleted = await Product.deleteOne({ _id: id })
             if (deleted) {
                 return res.status(200).json({ deleted })
@@ -106,19 +103,21 @@ exports.getProduct = async (req, res) => {
 exports.getProductByName = async (req, res) => {
     try {
         const {name}=req.params;
+        console.log(name)
         const brand=await Brand.findOne({name}).select('_id')
+        console.log(brand)
         if(brand){
             const products=await Product.find({brand:brand._id}).populate({path:"category brand",select:"_id name"})
             if(products){
                 return res.status(201).json({
                      products,
                      productsByPrice:{
-                        under5k:products.filter(product=>product.price<5000),
-                        under10k:products.filter(product=>product.price<10000 && product.price>5000),
-                        under15k:products.filter(product=>product.price<15000 && product.price>10000),
-                        under20k:products.filter(product=>product.price<20000 && product.price>15000),
-                        under25k:products.filter(product=>product.price<25000 && product.price>20000),
-                        under30k:products.filter(product=>product.price<30000 && product.price>25000),
+                        under5k:products.filter(product=>(product.price-(product.price*product.offer/100))<5000),
+                        under10k:products.filter(product=>(product.price-(product.price*product.offer/100))<10000 && (product.price-(product.price*product.offer/100))>5000),
+                        under15k:products.filter(product=>(product.price-(product.price*product.offer/100))<15000 && (product.price-(product.price*product.offer/100))>10000),
+                        under20k:products.filter(product=>(product.price-(product.price*product.offer/100))<20000 && (product.price-(product.price*product.offer/100))>15000),
+                        under25k:products.filter(product=>(product.price-(product.price*product.offer/100))<25000 && (product.price-(product.price*product.offer/100))>20000),
+                        under30k:products.filter(product=>(product.price-(product.price*product.offer/100))<30000 && (product.price-(product.price*product.offer/100))>25000),
                     }
                     })
             }

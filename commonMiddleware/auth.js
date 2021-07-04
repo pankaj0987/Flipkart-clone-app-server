@@ -12,8 +12,20 @@ const storage = multer.diskStorage({
       cb(null, shortid.generate() + "." + file.originalname)
     }
   })
+
+
    
-exports.upload = multer({ storage: storage })
+exports.upload = multer({
+  storage: storage,
+  fileFilter:(req,file,cb)=>{
+    if(!file.mimetype.match(/jpeg|png|png|gif$i/)) {
+      cb(new Error("file is not supported"),false)
+      return
+    }
+    cb(null,true)
+  } 
+
+  })
 
 exports.requireSignin = (req, res, next) => {
     if (req.headers.authorization) {
@@ -24,7 +36,6 @@ exports.requireSignin = (req, res, next) => {
             if (err) {
                 return res.status(501).json({ message: "jwt expired" })
             }
-            console.log(decoded)
             req.user = decoded;
           });
 
@@ -39,7 +50,6 @@ exports.requireSignin = (req, res, next) => {
 
 exports.isAdminLogin = async (req, res, next) => {
     try {
-        console.log(req.user)
         const { role } = req.user;
 
         if (role === "admin") {

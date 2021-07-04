@@ -40,7 +40,7 @@ exports.adminLogin = async (req,res)=>{
 
                 if(await bcrypt.compare(password,userExist.password)){
                     const {_id,firstName,role,lastName,email,phone}=userExist;
-                    const token=jwt.sign({_id:_id,role},process.env.JWTSECRET,{expiresIn:'1h'})
+                    const token=jwt.sign({_id:_id,role},process.env.JWTSECRET,{expiresIn:'24h'})
                     return res.status(201).json({
                         token:token,
                         user:{_id,firstName,lastName,email,phone}

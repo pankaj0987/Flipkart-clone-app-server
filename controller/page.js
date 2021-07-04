@@ -1,22 +1,28 @@
 const Page=require('../model/pageSchema')
+const cloudinary=require('../utils/cloudnary')
+const fs = require('fs');
 
 exports.addPage=async (req,res)=>{
     const {banners,products}=req.files;
+    const uploaded=async(path)=>await cloudinary.uploads(path,'flipkart_clone')
     if(banners && banners.length>0){
-        req.body.banners=banners.map((banner,index)=>(
-            {
-            img:`/public/${banner.filename}`,
-            navigateTo:`/banner?brand=${req.body.brand}&product=${req.body.products[index]}`
+        req.body.banners=[]
+        let i=0;
+        for(const banner of banners){
+            const {path}=banner
+            const newPath=await uploaded(path)
+            fs.unlinkSync(path)
+            req.body.banners.push({img:`${newPath.url}`,navigateTo:`/banner?brand=${req.body.brand}&product=${req.body.products[i]}`})
+            i++
             }
-        ));
     }
     if(products && products.length>0){
-        req.body.products=products.map((product,index)=>(
-            {
-            img:`/public/${product.filename}`,
-            navigateTo:`/banner?brand=${req.body.brand}&product=${req.body.product[index]}`
-            }
-        ));
+        // req.body.products=products.forEach((product,index)=>(
+        //     {
+        //     img:`/public/${product.filename}`,
+        //     navigateTo:`/banner?brand=${req.body.brand}&product=${req.body.product[index]}`
+        //     }
+        // ));
         }
     req.body.createdBy=req.user._id;
 
