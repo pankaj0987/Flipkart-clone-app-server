@@ -103,9 +103,7 @@ exports.getProduct = async (req, res) => {
 exports.getProductByName = async (req, res) => {
     try {
         const {name}=req.params;
-        console.log(name)
         const brand=await Brand.findOne({name}).select('_id')
-        console.log(brand)
         if(brand){
             const products=await Product.find({brand:brand._id}).populate({path:"category brand",select:"_id name"})
             if(products){

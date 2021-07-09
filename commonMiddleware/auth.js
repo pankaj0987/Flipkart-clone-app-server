@@ -62,7 +62,7 @@ exports.isAdminLogin = async (req, res, next) => {
 
 
     } catch (error) {
-        console.log(error)
+        return res.status(501).json({ error: "something went wrong" })
         
     }
 
@@ -80,7 +80,7 @@ exports.isUserLogin = async (req, res, next) => {
 
 
     } catch (error) {
-        console.log(error)
+        return res.status(501).json({ error: "something went wrong" })
         
     }
 
